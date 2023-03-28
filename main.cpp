@@ -3,8 +3,6 @@
 #include <algorithm>
 using namespace std;
 
-//"Hello"
-
 struct Lecturer {
     string lecID;
     string lecName;
@@ -32,7 +30,7 @@ Student* studC = new Student{"S03", "Cameron Tan", "cameron@uow.edu.my", "017654
 Student* studD = new Student{"S04", "Diana Chin", "diana@uow.edu.my", "0165432123", "USENG", NULL};
 Student* studE = new Student{"S05", "Elliot Khoo", "elliot@uow.edu.my", "0154329876", "UBUSS", NULL};
 
-// Struct for Schedule of Booked Consultations(schedType: B), Available Consultations (schedType: A), and Lecturer's Class Time (schedType: C)
+// Struct for Schedule of Booked Consultations(schedType: B), Available Consultations (schedType: A)
 // Lecturer's Class Time is when the lecturer is not available for consultations
 struct Schedule {
     tm schedDateTime;
@@ -109,7 +107,8 @@ int main() {
                 cout << "\n1. Set Schedule for Consultation" << endl;
                 cout << "2. View Consultation Schedule" << endl;
                 cout << "3. View Students with Booked Consultation" << endl;
-                cout << "4. View Full Schedule" << endl;
+                // TODO: Review this
+                // cout << "4. View Full Schedule" << endl;
                 cout << "5. Edit Consultation Slot Information" << endl;
                 cout << "6. Delete Consultation Slot" << endl;
 
@@ -137,6 +136,7 @@ int main() {
                     action = continueSession(action);
                 } else if (action == 4) {
                     // 4. View Full Schedule
+                    // TODO: Review this
                     action = continueSession(action);
                 } else if (action == 5) {
                     // 5. Edit Consultation Slot Information
@@ -175,7 +175,7 @@ int main() {
             do {
                 cout << "\nWelcome, " << currentStud->studName << "!\n";
 
-                cout << "\n1. View and Book Consulation Slots" << endl;
+                cout << "\n1. View and Book Consultation Slots" << endl;
                 cout << "2. View Booked Consultation Slots" << endl;
                 cout << "3. View Booked Consultation History" << endl;
                 cout << "4. Delete Booked Consultation Slots" << endl;
