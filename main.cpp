@@ -70,6 +70,12 @@ void addSchedule(tm schedDateTime, string subject, string venue, string lecID, s
 
 void viewSchedulesForLecturer(Lecturer *lecturer);
 
+void viewAvailableConsultation(Lecturer *lecturer);
+
+void viewSchedulesForStudent(Student *student);
+
+void viewBookingHistory(Student *student);
+
 void viewStudentsWithBookedConsultation(Lecturer *lecturer);
 
 Schedule *searchScheduleByDateTime(tm schedDateTime);
@@ -179,6 +185,7 @@ int main() {
 
                         // Get venue
                         cout << "Venue: ";
+                        cin.ignore();
                         getline(cin, venue, '\n');
 
                         // Get lecturer ID
@@ -238,6 +245,7 @@ int main() {
 
                             // Get venue
                             cout << "Venue: ";
+                            cin.ignore();
                             getline(cin, venue, '\n');
 
                             // Update schedule
@@ -330,15 +338,123 @@ int main() {
                 char choice;
                 if (action == 1) {
                     // 1. View and Book Consulation Slots
+                    cout << "\nWhich lecturer's consultation slots would you like to book?" << endl;
+                    cout << "Lecturer ID: ";
+                    string searchID;
+                    cin.ignore();
+                    getline(cin, searchID, '\n');
+                    transform(searchID.begin(), searchID.end(), searchID.begin(), ::toupper);
+
+                    Lecturer *searchedLec = new Lecturer;
+                    searchedLec = searchLec(searchID);
+
+                    if (searchedLec != NULL) {
+                        viewAvailableConsultation(searchedLec);
+
+                        // Prompt to book a consultation slot
+                        char prompt = promptUser("\nDo you wish to book a consultation slot? (Y/N): ");
+
+                        if (prompt == 'Y') {
+                            // Get date from user to search for schedule
+                            tm schedDateTime;
+                            do {
+                                cout << "\nDate and Time of Consultation (DD/MM/YYYY HH:MM): ";
+                                string inDateTime;
+                                cin.ignore();
+                                getline(cin, inDateTime, '\n');
+
+                                // Convert string to tm struct
+                                istringstream ss(inDateTime);
+                                ss >> get_time(&schedDateTime, "%d/%m/%Y %H:%M");
+
+                                // Validate date and time
+                                if (!validateDate(&schedDateTime)) {
+                                    cout << "\nInvalid date and time. Please try again." << endl;
+                                }
+                            } while (!validateDate(&schedDateTime));
+
+                            // Search for schedule
+                            Schedule *currentSched = searchScheduleByDateTime(schedDateTime);
+
+                            // If schedule is found
+                            if (currentSched != NULL) {
+                                // Get new details from user
+                                string inSubject;
+
+                                // Get subject
+                                cout << "Subject: ";
+                                cin.ignore();
+                                getline(cin, inSubject, '\n');
+
+                                // Update schedule
+                                currentSched->subject = inSubject;
+                                currentSched->studID = currentStud->studID;
+                                currentSched->schedType = 'B';
+
+                                cout << "Consultation slot is successfully booked!" << endl;
+
+                                // View updated schedule
+                                viewAvailableConsultation(searchedLec);
+                            } else {
+                                cout << "\nConsultation slot not found. Please try again." << endl;
+                            }
+                        }
+                    } else {
+                        cout << "Lecturer not found. Please try again." << endl;
+                    }
+
                     action = continueSession(action);
                 } else if (action == 2) {
                     // 2. View Booked Consultation Slots
+                    viewSchedulesForStudent(currentStud);
                     action = continueSession(action);
                 } else if (action == 3) {
                     // 3. View Booked Consultation History
+                    viewBookingHistory(currentStud);
                     action = continueSession(action);
                 } else if (action == 4) {
                     // 4. Delete Booked Consultation Slot
+                    viewSchedulesForStudent(currentStud);
+
+                    // Prompt to delete a consultation slot
+                    char prompt = promptUser("\nDo you wish to delete a consultation slot? (Y/N): ");
+
+                    if (prompt == 'Y') {
+                        // Get date from user to search for schedule
+                        tm schedDateTime;
+                        do {
+                            cout << "\nDate and Time of Consultation (DD/MM/YYYY HH:MM): ";
+                            string inDateTime;
+                            cin.ignore();
+                            getline(cin, inDateTime, '\n');
+
+                            // Convert string to tm struct
+                            istringstream ss(inDateTime);
+                            ss >> get_time(&schedDateTime, "%d/%m/%Y %H:%M");
+
+                            // Validate date and time
+                            if (!validateDate(&schedDateTime)) {
+                                cout << "\nInvalid date and time. Please try again." << endl;
+                            }
+                        } while (!validateDate(&schedDateTime));
+
+                        // Search for schedule
+                        Schedule *currentSched = searchScheduleByDateTime(schedDateTime);
+
+                        // If schedule is found
+                        if (currentSched != NULL) {
+                            // Update schedule
+                            currentSched->subject = "";
+                            currentSched->studID = "";
+                            currentSched->schedType = 'A';
+
+                            cout << "Consultation slot is successfully deleted!" << endl;
+
+                            // View updated schedule
+                            viewSchedulesForStudent(currentStud);
+                        }
+                    }
+
                     action = continueSession(action);
                 } else {
                     cout << "Please only enter the integers 1, 2, 3, or 4." << endl;
@@ -452,7 +568,6 @@ bool isDateWithin7DaysFromNow(std::tm inputDate) {
 }
 
 void addSchedule(tm schedDateTime, string subject, string venue, string lecID, string studID, char schedType) {
-
     // Validation for adding only for the current week
     // Check if the consultation is within the current week
     time_t now = time(0);
@@ -542,6 +657,97 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
                 }
                 cout << "----------------------------------------------" << endl;
             }
+        }
+        temp = temp->nxtSched;
+    }
+}
+
+void viewAvailableConsultation(Lecturer *lecturer) {
+    Schedule *temp = frontSched;
+    time_t now = time(0);
+    tm *currentDate = localtime(&now);
+
+    cout << "\nConsultations of the Week for " << lecturer->lecID << " - " << lecturer->lecName << ":" << endl;
+
+    while (temp != NULL) {
+        if ((temp->lecID == lecturer->lecID) && (temp->schedType== 'A') && (isDateWithin7DaysFromNow(temp->schedDateTime))) {
+            cout << "----------------------------------------------" << endl;
+            tm dateTime = temp->schedDateTime;
+            auto dateStr = to_string(dateTime.tm_mday) + "/" + to_string(dateTime.tm_mon + 1) + "/" +
+                            to_string(dateTime.tm_year + 1900);
+            auto timeStr = to_string(dateTime.tm_hour) + ":" + to_string(dateTime.tm_min);
+
+            cout << "Date: " << dateStr << endl;
+            cout << "Time: " << timeStr << endl;
+            cout << "Subject: " << "--" << endl;
+            cout << "Venue: " << temp->venue << endl;
+            cout << "Lecturer: " << lecturer->lecID << " - " << lecturer->lecName << endl;
+            cout << "Student: " << "--" << endl;
+            cout << "Consultation: " << "Available" << endl;
+
+            cout << "----------------------------------------------" << endl;
+        }
+           temp = temp->nxtSched;     
+    }
+}
+
+void viewSchedulesForStudent(Student *student) {
+    Schedule *temp = frontSched;
+    time_t now = time(0);
+    tm *currentDate = localtime(&now);
+
+    cout << "\nConsultations of the Week for " << student->studID << " - " << student->studName << ":" << endl;
+
+    while (temp != NULL) {
+        if ((temp->studID == student->studID)) {
+            if (isDateWithin7DaysFromNow(temp->schedDateTime)) {
+                cout << "----------------------------------------------" << endl;
+                tm dateTime = temp->schedDateTime;
+                auto dateStr = to_string(dateTime.tm_mday) + "/" + to_string(dateTime.tm_mon + 1) + "/" +
+                               to_string(dateTime.tm_year + 1900);
+                auto timeStr = to_string(dateTime.tm_hour) + ":" + to_string(dateTime.tm_min);
+
+                Lecturer *lecturer = searchLec(temp->lecID);
+
+                cout << "Date: " << dateStr << endl;
+                cout << "Time: " << timeStr << endl;
+                cout << "Subject: " << temp->subject << endl;
+                cout << "Venue: " << temp->venue << endl;
+                cout << "Lecturer: " << lecturer->lecID << " - " << lecturer->lecName << endl;
+                cout << "Student: " << student->studID << " - " << student->studName << endl;
+                cout << "Consultation: " << "Booked" << endl;
+                cout << "----------------------------------------------" << endl;
+            }
+        }
+        temp = temp->nxtSched;
+    }
+}
+
+void viewBookingHistory(Student * student) {
+    Schedule *temp = frontSched;
+    time_t now = time(0);
+    tm *currentDate = localtime(&now);
+
+    cout << "\nAll Booked Consultations of " << student->studID << " - " << student->studName << ":" << endl;
+
+    while (temp != NULL) {
+        if ((temp->studID == student->studID)) {
+            cout << "----------------------------------------------" << endl;
+            tm dateTime = temp->schedDateTime;
+            auto dateStr = to_string(dateTime.tm_mday) + "/" + to_string(dateTime.tm_mon + 1) + "/" +
+                            to_string(dateTime.tm_year + 1900);
+            auto timeStr = to_string(dateTime.tm_hour) + ":" + to_string(dateTime.tm_min);
+
+            Lecturer *lecturer = searchLec(temp->lecID);
+
+            cout << "Date: " << dateStr << endl;
+            cout << "Time: " << timeStr << endl;
+            cout << "Subject: " << temp->subject << endl;
+            cout << "Venue: " << temp->venue << endl;
+            cout << "Lecturer: " << lecturer->lecID << " - " << lecturer->lecName << endl;
+            cout << "Student: " << student->studID << " - " << student->studName << endl;
+            cout << "Consultation: " << "Booked" << endl;
+            cout << "----------------------------------------------" << endl;
         }
         temp = temp->nxtSched;
     }
