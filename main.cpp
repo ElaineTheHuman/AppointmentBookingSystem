@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
+#include <ctime>
 
 using namespace std;
 
@@ -85,7 +87,7 @@ int main() {
     frontStud = studA;
 
     // Existing schedules already added into the system
-    tm schedDateTime1 = {0, 0, 10, 1, 3, 123}; // 1st April, 10am
+    tm schedDateTime1 = {0, 0, 10, 30, 2, 123}; // 1st April, 10am
     tm schedDateTime2 = {0, 0, 15, 2, 3, 123}; // 2nd April, 3pm
     tm schedDateTime3 = {0, 0, 8, 3, 3, 123}; // 3rd April, 8am
     tm schedDateTime4 = {0, 0, 14, 4, 3, 123}; // 4th April, 2pm
@@ -440,6 +442,24 @@ bool isSameDate(tm date1, tm date2) {
     return (date1.tm_year == date2.tm_year) && (date1.tm_mon == date2.tm_mon) && (date1.tm_mday == date2.tm_mday);
 }
 
+// Returns true if the given date falls within the current week, false otherwise.
+bool isDateWithinCurrentWeek(std::tm inputDate) {
+    // Convert the input date to a time_t value.
+    std::time_t inputTime = std::mktime(&inputDate);
+
+    // Get the current time as a system_clock time_point, and convert it to a time_t value.
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    std::time_t nowTime = std::chrono::system_clock::to_time_t(now);
+
+    // Calculate the time one week ago by subtracting 7 days' worth of hours from the current time.
+    const std::chrono::hours weekHours(7 * 24);
+    std::time_t weekAgoTime = nowTime - weekHours.count() * std::chrono::hours(1).count();
+
+    // Return true if the input time falls within the current week (between one week ago and now),
+    // false otherwise.
+    return (inputTime >= weekAgoTime && inputTime <= nowTime);
+}
+
 void addSchedule(tm schedDateTime, string subject, string venue, string lecID, string studID, char schedType) {
 
     // Check if a schedule with the same datetime and lecturer ID already exists
@@ -508,8 +528,7 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
     while (temp != NULL) {
         // TODO: Fix - current week criteria
         if ((temp->lecID == lecturer->lecID)) {
-            int daysDiff = (temp->schedDateTime.tm_yday - currentDate->tm_yday) % 7;
-            if (daysDiff >= 0 && daysDiff < 7) {
+            if (isDateWithinCurrentWeek(temp->schedDateTime)) {
                 tm dateTime = temp->schedDateTime;
                 auto dateStr = to_string(dateTime.tm_mday) + "/" + to_string(dateTime.tm_mon + 1) + "/" +
                                to_string(dateTime.tm_year + 1900);
@@ -524,10 +543,9 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
                     cout << "Lecturer: " << lecturer->lecID << " - " << lecturer->lecName << endl;
                     cout << "Student: " << student->studID << " - " << student->studName << endl;
                     cout << "Consultation: " << "Booked" << endl;
-                }
-                    // TODO: Is the below necessary
+                } else {
                     // if the student does not exist, display -- instead
-                else {
+
                     cout << "Date: " << dateStr << endl;
                     cout << "Time: " << timeStr << endl;
                     cout << "Subject: " << temp->subject << endl;
