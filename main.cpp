@@ -169,6 +169,7 @@ int main() {
                             getline(cin, inDateTime, '\n');
 
                             // Validate that time was entered
+                            // TODO: Improve
                             if (inDateTime.length() < 16 && inDateTime.length() > 0 && inDateTime[2] == '/' &&
                                 inDateTime[5] == '/' && inDateTime[10] == ' ' && inDateTime[13] == ':') {
                                 cout << "\nInvalid date and time. Please try again." << endl;
@@ -469,6 +470,7 @@ void addSchedule(tm schedDateTime, string subject, string venue, string lecID, s
 
     // Validation for adding only for the current week
     // Check if the consultation is within the current week
+    // TODO: Improve
     time_t now = time(0);
     tm *currentDate = localtime(&now);
     
@@ -478,6 +480,7 @@ void addSchedule(tm schedDateTime, string subject, string venue, string lecID, s
     }
 
     // Check if a schedule with the same datetime and lecturer ID already exists
+    // TODO: Improve
     Schedule *temp = frontSched;
     while (temp != NULL) {
         if (temp->lecID == lecID && temp->schedDateTime.tm_year == schedDateTime.tm_year &&
