@@ -523,11 +523,18 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
                     cout << "Venue: " << temp->venue << endl;
                     cout << "Lecturer: " << lecturer->lecID << " - " << lecturer->lecName << endl;
                     cout << "Student: " << student->studID << " - " << student->studName << endl;
+                    cout << "Consultation: " << "Booked" << endl;
                 }
                     // TODO: Is the below necessary
                     // if the student does not exist, display -- instead
                 else {
-                    cout << setw(20) << dateStr << setw(10) << timeStr << setw(15) << "--" << setw(20) << "--" << endl;
+                    cout << "Date: " << dateStr << endl;
+                    cout << "Time: " << timeStr << endl;
+                    cout << "Subject: " << temp->subject << endl;
+                    cout << "Venue: " << temp->venue << endl;
+                    cout << "Lecturer: " << lecturer->lecID << " - " << lecturer->lecName << endl;
+                    cout << "Student: " << "--" << endl;
+                    cout << "Consultation: " << "Available" << endl;
                 }
             }
         }
