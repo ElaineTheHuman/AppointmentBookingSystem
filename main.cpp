@@ -56,6 +56,8 @@ char promptUser(string msg);
 
 bool isSameDate(tm date1, tm date2);
 
+bool isDateWithin7DaysFromNow(tm inputDate);
+
 Lecturer *searchLec(string inID);
 
 Student *searchStud(string inID);
@@ -87,7 +89,7 @@ int main() {
     frontStud = studA;
 
     // Existing schedules already added into the system
-    tm schedDateTime1 = {0, 0, 10, 30, 2, 123}; // 1st April, 10am
+    tm schedDateTime1 = {0, 0, 10, 1, 3, 123}; // 1st April, 10am
     tm schedDateTime2 = {0, 0, 15, 2, 3, 123}; // 2nd April, 3pm
     tm schedDateTime3 = {0, 0, 8, 3, 3, 123}; // 3rd April, 8am
     tm schedDateTime4 = {0, 0, 14, 4, 3, 123}; // 4th April, 2pm
@@ -96,7 +98,7 @@ int main() {
     addSchedule(schedDateTime3, "IT Project Management", "03-CRM-13", "L01", "S01", 'B');
     addSchedule(schedDateTime2, "", "MS Teams", "L02", "", 'A');
     addSchedule(schedDateTime4, "Web Development", "03-CRM-10", "L02", "S01", 'B');
-    addSchedule(schedDateTime5, "Whatever", "MS Teams", "L03", "S01", 'B');
+    addSchedule(schedDateTime5, "Computer Ethics", "MS Teams", "L03", "S01", 'B');
     addSchedule(schedDateTime1, "", "MS Teams", "L03", "", 'A');
     addSchedule(schedDateTime4, "Data Structures", "03-CRM-08", "L04", "S02", 'B');
 
@@ -289,9 +291,13 @@ int main() {
                             if (!validateDate(&schedDateTime)) {
                                 cout << "\nInvalid date and time. Please try again." << endl;
                             }
+
+                            
                         } while (!validateDate(&schedDateTime));
 
                         deleteSchedule(schedDateTime);
+
+                        viewSchedulesForLecturer(currentLec);
                     }
 
                     action = continueSession(action);
@@ -442,8 +448,8 @@ bool isSameDate(tm date1, tm date2) {
     return (date1.tm_year == date2.tm_year) && (date1.tm_mon == date2.tm_mon) && (date1.tm_mday == date2.tm_mday);
 }
 
-// Returns true if the given date falls within the current week, false otherwise.
-bool isDateWithinCurrentWeek(std::tm inputDate) {
+// Returns true if the given date is within 7 days from the current date, false otherwise.
+bool isDateWithin7DaysFromNow(std::tm inputDate) {
     // Convert the input date to a time_t value.
     std::time_t inputTime = std::mktime(&inputDate);
 
@@ -451,30 +457,27 @@ bool isDateWithinCurrentWeek(std::tm inputDate) {
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
     std::time_t nowTime = std::chrono::system_clock::to_time_t(now);
 
-    // Calculate the time one week ago by subtracting 7 days' worth of hours from the current time.
-    const std::chrono::hours weekHours(7 * 24);
-    std::time_t weekAgoTime = nowTime - weekHours.count() * std::chrono::hours(1).count();
+    // Calculate the time 7 days from now by adding 7 days' worth of seconds to the current time.
+    std::time_t weekFromNowTime = nowTime + 7 * 24 * 60 * 60;
 
-    // Return true if the input time falls within the current week (between one week ago and now),
+    // Return true if the input time is within 7 days from now (between now and 7 days from now),
     // false otherwise.
-    return (inputTime >= weekAgoTime && inputTime <= nowTime);
+    return (inputTime >= nowTime && inputTime <= weekFromNowTime);
 }
 
 void addSchedule(tm schedDateTime, string subject, string venue, string lecID, string studID, char schedType) {
-
-    // Check if a schedule with the same datetime and lecturer ID already exists
 
     // Validation for adding only for the current week
     // Check if the consultation is within the current week
     time_t now = time(0);
     tm *currentDate = localtime(&now);
-    int daysDiff = (schedDateTime.tm_yday - currentDate->tm_yday) % 7;
-    // TODO: Fix - current week criteria
-    if (daysDiff >= 0 && daysDiff < 7) {
-        cout << "\nConsultation slot is within the current week. Please try again." << endl;
+    
+    if (!isDateWithin7DaysFromNow(schedDateTime)) {
+        cout << "\nConsultation slot is not within the current week. Please try again." << endl;
         return;
     }
 
+    // Check if a schedule with the same datetime and lecturer ID already exists
     Schedule *temp = frontSched;
     while (temp != NULL) {
         if (temp->lecID == lecID && temp->schedDateTime.tm_year == schedDateTime.tm_year &&
@@ -522,13 +525,11 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
     tm *currentDate = localtime(&now);
 
     cout << "\nConsultations of the Week for " << lecturer->lecID << " - " << lecturer->lecName << ":" << endl;
-    cout << "--------------------------------------------------------------------------------------------------"
-         << endl;
 
     while (temp != NULL) {
-        // TODO: Fix - current week criteria
         if ((temp->lecID == lecturer->lecID)) {
-            if (isDateWithinCurrentWeek(temp->schedDateTime)) {
+            if (isDateWithin7DaysFromNow(temp->schedDateTime)) {
+                cout << "----------------------------------------------" << endl;
                 tm dateTime = temp->schedDateTime;
                 auto dateStr = to_string(dateTime.tm_mday) + "/" + to_string(dateTime.tm_mon + 1) + "/" +
                                to_string(dateTime.tm_year + 1900);
@@ -545,15 +546,15 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
                     cout << "Consultation: " << "Booked" << endl;
                 } else {
                     // if the student does not exist, display -- instead
-
                     cout << "Date: " << dateStr << endl;
                     cout << "Time: " << timeStr << endl;
-                    cout << "Subject: " << temp->subject << endl;
+                    cout << "Subject: " << "--" << endl;
                     cout << "Venue: " << temp->venue << endl;
                     cout << "Lecturer: " << lecturer->lecID << " - " << lecturer->lecName << endl;
                     cout << "Student: " << "--" << endl;
                     cout << "Consultation: " << "Available" << endl;
                 }
+                cout << "----------------------------------------------" << endl;
             }
         }
         temp = temp->nxtSched;
@@ -568,8 +569,8 @@ void viewStudentsWithBookedConsultation(Lecturer *lecturer) {
         // only show current week's consultations
         time_t now = time(0);
         tm *currentDate = localtime(&now);
-        int daysDiff = (currentSched->schedDateTime.tm_yday - currentDate->tm_yday) % 7;
-        if (daysDiff < 0 || daysDiff > 7) {
+       
+        if (!isDateWithin7DaysFromNow(currentSched->schedDateTime)) {
             currentSched = currentSched->nxtSched;
             continue;
         }
@@ -582,26 +583,26 @@ void viewStudentsWithBookedConsultation(Lecturer *lecturer) {
                 currentSched = currentSched->nxtSched;
                 continue;
             }
-            cout << "\n--------------------------------------------------------------" << endl;
+            cout << "\n----------------------------------------------" << endl;
             // Display student details
-            cout << "\nStudent ID: " << currentStud->studID << endl;
-            cout << "Student Name: " << currentStud->studName << endl;
-            cout << "Student Email: " << currentStud->studEmail << endl;
-            cout << "Student Course: " << currentStud->studCourse << endl;
+            cout << "\nStudent Details" << endl;
+            cout << "ID: " << currentStud->studID << endl;
+            cout << "Name: " << currentStud->studName << endl;
+            cout << "Email: " << currentStud->studEmail << endl;
+            cout << "Phone: " << currentStud->studPhone << endl;
+            cout << "Course: " << currentStud->studCourse << endl;
 
             // Get all booked consultation slots for student
-
             // Display consultation details
-            cout << "\n--------------------------------------------------------------" << endl;
-            cout << "Consultation Date: " << currentSched->schedDateTime.tm_mday << "/"
+            cout << "\nConsultation Details" << endl;
+            cout << "Date: " << currentSched->schedDateTime.tm_mday << "/"
                  << currentSched->schedDateTime.tm_mon + 1 << "/" << currentSched->schedDateTime.tm_year + 1900 << endl;
-            cout << "Consultation Time: " << currentSched->schedDateTime.tm_hour << ":"
+            cout << "Time: " << currentSched->schedDateTime.tm_hour << ":"
                  << currentSched->schedDateTime.tm_min << endl;
-            cout << "Consultation Venue: " << currentSched->venue << endl;
-            cout << "Consultation Subject: " << currentSched->subject << endl;
+            cout << "Venue: " << currentSched->venue << endl;
+            cout << "Subject: " << currentSched->subject << endl;
 
-            cout << "------------------------------------------------------------\n" << endl;
-
+            cout << "\n----------------------------------------------" << endl;
 
         }
 
@@ -635,7 +636,8 @@ void deleteSchedule(tm schedDateTime) {
                 prev->nxtSched = temp->nxtSched;
             }
             delete temp;
-            cout << "Consultation slot successfully deleted!";
+            cout << "Consultation slot successfully deleted!" << endl;
+
             return;
         }
         prev = temp;
