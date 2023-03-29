@@ -85,11 +85,11 @@ int main() {
     frontStud = studA;
 
     // Existing schedules already added into the system
-    tm schedDateTime1 = {0, 0, 10, 1, 4, 123}; // 1st May, 10am
-    tm schedDateTime2 = {0, 0, 15, 2, 4, 123}; // 2nd May, 3pm
-    tm schedDateTime3 = {0, 0, 8, 3, 4, 123}; // 3rd May, 8am
-    tm schedDateTime4 = {0, 0, 14, 4, 4, 123}; // 4th May, 2pm
-    tm schedDateTime5 = {0, 0, 12, 5, 4, 123}; // 5th May, 12pm
+    tm schedDateTime1 = {0, 0, 10, 1, 3, 123}; // 1st April, 10am
+    tm schedDateTime2 = {0, 0, 15, 2, 3, 123}; // 2nd April, 3pm
+    tm schedDateTime3 = {0, 0, 8, 3, 3, 123}; // 3rd April, 8am
+    tm schedDateTime4 = {0, 0, 14, 4, 3, 123}; // 4th April, 2pm
+    tm schedDateTime5 = {0, 0, 12, 5, 3, 123}; // 5th April, 12pm
     addSchedule(schedDateTime1, "", "MS Teams", "L01", "", 'A');
     addSchedule(schedDateTime3, "IT Project Management", "03-CRM-13", "L01", "S01", 'B');
     addSchedule(schedDateTime2, "", "MS Teams", "L02", "", 'A');
@@ -447,8 +447,6 @@ bool isSameDate(tm date1, tm date2) {
 void addSchedule(tm schedDateTime, string subject, string venue, string lecID, string studID, char schedType) {
 
     // Check if a schedule with the same datetime and lecturer ID already exists
-    // TODO: Validation for if time is overlapping? Do we need that?
-
 
     // Validation for adding only for the current week
     // Check if the consultation is within the current week
@@ -514,7 +512,6 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
 
     while (temp != NULL) {
         // TODO: Show all details
-        // TODO: Display in date & time order
         if ((temp->lecID == lecturer->lecID)) {
             int daysDiff = (temp->schedDateTime.tm_yday - currentDate->tm_yday) % 7;
             if (daysDiff >= 0 && daysDiff < 7) {
