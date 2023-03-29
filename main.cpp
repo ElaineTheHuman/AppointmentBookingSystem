@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+
 using namespace std;
 
 struct Lecturer {
@@ -13,11 +14,11 @@ struct Lecturer {
     Lecturer *nxtLec;
 } *frontLec, *rearLec = NULL;
 // Existing Lecturers
-Lecturer* lecA = new Lecturer{"L01", "Alice Kee", "alice@uow.edu.my", "0112345678", NULL};
-Lecturer* lecB = new Lecturer{"L02", "Bryan Law", "bryan@uow.edu.my", "0123456789", NULL};
-Lecturer* lecC = new Lecturer{"L03", "Carol Foo", "carol@uow.edu.my", "0134567891", NULL};
-Lecturer* lecD = new Lecturer{"L04", "Damien Ho", "damien@uow.edu.my", "0145678912", NULL};
-Lecturer* lecE = new Lecturer{"L05", "Emily Tan", "emily@uow.edu.my", "0156789123", NULL};
+Lecturer *lecA = new Lecturer{"L01", "Alice Kee", "alice@uow.edu.my", "0112345678", NULL};
+Lecturer *lecB = new Lecturer{"L02", "Bryan Law", "bryan@uow.edu.my", "0123456789", NULL};
+Lecturer *lecC = new Lecturer{"L03", "Carol Foo", "carol@uow.edu.my", "0134567891", NULL};
+Lecturer *lecD = new Lecturer{"L04", "Damien Ho", "damien@uow.edu.my", "0145678912", NULL};
+Lecturer *lecE = new Lecturer{"L05", "Emily Tan", "emily@uow.edu.my", "0156789123", NULL};
 
 struct Student {
     string studID;
@@ -28,11 +29,11 @@ struct Student {
     Student *nxtStud;
 } *frontStud, *rearStud = NULL;
 // Existing Students
-Student* studA = new Student{"S01", "Allison Lee", "allison@uow.edu.my", "0198765432", "USENG", NULL};
-Student* studB = new Student{"S02", "Brook Yap", "brook@uow.edu.my", "0187654321", "UCOMMS", NULL};
-Student* studC = new Student{"S03", "Cameron Tan", "cameron@uow.edu.my", "0176543212", "UEIM", NULL};
-Student* studD = new Student{"S04", "Diana Chin", "diana@uow.edu.my", "0165432123", "USENG", NULL};
-Student* studE = new Student{"S05", "Elliot Khoo", "elliot@uow.edu.my", "0154329876", "UBUSS", NULL};
+Student *studA = new Student{"S01", "Allison Lee", "allison@uow.edu.my", "0198765432", "USENG", NULL};
+Student *studB = new Student{"S02", "Brook Yap", "brook@uow.edu.my", "0187654321", "UCOMMS", NULL};
+Student *studC = new Student{"S03", "Cameron Tan", "cameron@uow.edu.my", "0176543212", "UEIM", NULL};
+Student *studD = new Student{"S04", "Diana Chin", "diana@uow.edu.my", "0165432123", "USENG", NULL};
+Student *studE = new Student{"S05", "Elliot Khoo", "elliot@uow.edu.my", "0154329876", "UBUSS", NULL};
 
 // Struct for Schedule of Booked Consultations(schedType: B) and Available Consultations (schedType: A)
 struct Schedule {
@@ -53,9 +54,9 @@ char promptUser(string msg);
 
 bool isSameDate(tm date1, tm date2);
 
-Lecturer* searchLec(string inID);
+Lecturer *searchLec(string inID);
 
-Student* searchStud(string inID);
+Student *searchStud(string inID);
 
 bool validateDate(tm *timestruct);
 
@@ -93,7 +94,7 @@ int main() {
     addSchedule(schedDateTime3, "IT Project Management", "03-CRM-13", "L01", "S01", 'B');
     addSchedule(schedDateTime2, "", "MS Teams", "L02", "", 'A');
     addSchedule(schedDateTime4, "Web Development", "03-CRM-10", "L02", "S01", 'B');
-    addSchedule(schedDateTime5, "", "MS Teams", "L03", "", 'A');
+    addSchedule(schedDateTime5, "Whatever", "MS Teams", "L03", "S01", 'B');
     addSchedule(schedDateTime1, "", "MS Teams", "L03", "", 'A');
     addSchedule(schedDateTime4, "Data Structures", "03-CRM-08", "L04", "S02", 'B');
 
@@ -105,11 +106,11 @@ int main() {
         cin >> user;
         cin.ignore();
         user = toupper(user);
-        
+
         if (user == 'L') {
 
             // Lecturer's Interface            
-            Lecturer* currentLec = new Lecturer;
+            Lecturer *currentLec = new Lecturer;
 
             // Verify if lecturer exists
             do {
@@ -137,7 +138,9 @@ int main() {
                 cout << "4. Edit Consultation Slot Information" << endl;
                 cout << "5. Delete Consultation Slot" << endl;
 
-                cout << "\nPlease select your desired action by entering integers 1, 2, 3, 4, or 5, based on the corresponding functions above." << endl;
+                cout
+                        << "\nPlease select your desired action by entering integers 1, 2, 3, 4, or 5, based on the corresponding functions above."
+                        << endl;
                 cout << "Action: ";
                 cin >> action;
 
@@ -150,7 +153,7 @@ int main() {
 
                     // Prompt to set schedule for consultation
                     char prompt = promptUser("\nDo you wish to set a new consultation slot? (Y/N): ");
-                    
+
                     if (prompt == 'Y') {
                         tm schedDateTime;
                         string subject, venue, lecID, studID;
@@ -163,12 +166,18 @@ int main() {
                             cin.ignore();
                             getline(cin, inDateTime, '\n');
 
+                            // Validate that time was entered
+                            if (inDateTime.length() < 16 && inDateTime.length() > 0 && inDateTime[2] == '/' &&
+                                inDateTime[5] == '/' && inDateTime[10] == ' ' && inDateTime[13] == ':') {
+                                cout << "\nInvalid date and time. Please try again." << endl;
+                                continue;
+                            }
+
                             // Convert string to tm struct
                             istringstream ss(inDateTime);
                             ss >> get_time(&schedDateTime, "%d/%m/%Y %H:%M");
 
-                            // Validate date and time
-                            // TODO: Fix - Can insert date without time
+
                             if (!validateDate(&schedDateTime)) {
                                 cout << "\nInvalid date and time. Please try again." << endl;
                             }
@@ -205,7 +214,7 @@ int main() {
 
                     // Prompt to edit consultation schedule
                     char prompt = promptUser("\nDo you wish to edit a consultation slot? (Y/N): ");
-                    
+
                     if (prompt == 'Y') {
                         // Get date from user to search for schedule
                         tm schedDateTime;
@@ -256,7 +265,7 @@ int main() {
 
                     // Prompt to delete consultation slot
                     char prompt = promptUser("\nDo you wish to delete a consultation slot? (Y/N): ");
-                    
+
                     if (prompt == 'Y') {
                         // Get date from user to search for schedule
                         tm schedDateTime;
@@ -266,12 +275,17 @@ int main() {
                             cin.ignore();
                             getline(cin, inDateTime, '\n');
 
+                            // Validate that time was entered
+                            if (inDateTime.length() < 16 && inDateTime.length() > 0 && inDateTime[2] == '/' &&
+                                inDateTime[5] == '/' && inDateTime[10] == ' ' && inDateTime[13] == ':') {
+                                cout << "\nInvalid date and time. Please try again." << endl;
+                                continue;
+                            }
                             // Convert string to tm struct
                             istringstream ss(inDateTime);
                             ss >> get_time(&schedDateTime, "%d/%m/%Y %H:%M");
 
                             // Validate date and time
-                            // TODO: Fix - Can insert date without time
                             if (!validateDate(&schedDateTime)) {
                                 cout << "\nInvalid date and time. Please try again." << endl;
                             }
@@ -290,8 +304,8 @@ int main() {
         } else if (user == 'S') {
 
             // Student's Interface
-            Student* currentStud = new Student;
-            
+            Student *currentStud = new Student;
+
             // Verify if student exists
             do {
                 cout << "\nStudent ID: ";
@@ -317,7 +331,9 @@ int main() {
                 cout << "3. View Booked Consultation History" << endl;
                 cout << "4. Delete Booked Consultation Slots" << endl;
 
-                cout << "\nPlease select your desired action by entering integers 1, 2, 3, or 4, based on the corresponding functions above." << endl;
+                cout
+                        << "\nPlease select your desired action by entering integers 1, 2, 3, or 4, based on the corresponding functions above."
+                        << endl;
                 cout << "Action: ";
                 cin >> action;
 
@@ -381,11 +397,11 @@ char promptUser(string msg) {
     return prompt;
 }
 
-Lecturer* searchLec(string inputID) {
-    Lecturer* temp = frontLec;
-    
+Lecturer *searchLec(string inputID) {
+    Lecturer *temp = frontLec;
+
     while (temp != NULL) {
-        if(temp->lecID == inputID) {
+        if (temp->lecID == inputID) {
             return temp;
         }
         temp = temp->nxtLec;
@@ -394,11 +410,11 @@ Lecturer* searchLec(string inputID) {
     return NULL;
 }
 
-Student* searchStud(string inputID) {
-    Student* temp = frontStud;
-    
+Student *searchStud(string inputID) {
+    Student *temp = frontStud;
+
     while (temp != NULL) {
-        if(temp->studID == inputID) {
+        if (temp->studID == inputID) {
             return temp;
         }
         temp = temp->nxtStud;
@@ -432,10 +448,25 @@ void addSchedule(tm schedDateTime, string subject, string venue, string lecID, s
 
     // Check if a schedule with the same datetime and lecturer ID already exists
     // TODO: Validation for if time is overlapping? Do we need that?
-    // TODO: Validation for adding only for the current week?
+
+
+    // Validation for adding only for the current week
+    // Check if the consultation is within the current week
+    time_t now = time(0);
+    tm *currentDate = localtime(&now);
+    int daysDiff = (schedDateTime.tm_yday - currentDate->tm_yday) % 7;
+    if (daysDiff >= 0 && daysDiff < 7) {
+        cout << "\nConsultation slot is within the current week. Please try again." << endl;
+        return;
+    }
+
     Schedule *temp = frontSched;
     while (temp != NULL) {
-        if (temp->lecID == lecID && temp->schedDateTime.tm_year == schedDateTime.tm_year && temp->schedDateTime.tm_mon == schedDateTime.tm_mon && temp->schedDateTime.tm_mday == schedDateTime.tm_mday && temp->schedDateTime.tm_hour == schedDateTime.tm_hour && temp->schedDateTime.tm_min == schedDateTime.tm_min) {
+        if (temp->lecID == lecID && temp->schedDateTime.tm_year == schedDateTime.tm_year &&
+            temp->schedDateTime.tm_mon == schedDateTime.tm_mon &&
+            temp->schedDateTime.tm_mday == schedDateTime.tm_mday &&
+            temp->schedDateTime.tm_hour == schedDateTime.tm_hour &&
+            temp->schedDateTime.tm_min == schedDateTime.tm_min) {
             cout << "\nConsultation slot with existing time and date already exists. Please try again." << endl;
             return;
         }
@@ -475,32 +506,33 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
     time_t now = time(0);
     tm *currentDate = localtime(&now);
 
-    cout << "\nConsultations of the Week for " << lecturer->lecID << " - " << lecturer->lecName << ":"
+    cout << "\nConsultations of the Week for " << lecturer->lecID << " - " << lecturer->lecName << ":" << endl;
+    cout << setw(12) << "\nDate" << setw(12) << "Time" << setw(15) << "Subject" << setw(15) << "Venue" << setw(15)
+         << "Student ID" << setw(20) << "Student Name" << setw(10) << "Type" << endl;
+    cout << "--------------------------------------------------------------------------------------------------"
          << endl;
-    cout << setw(12) << "\nDate" << setw(12) << "Time" << setw(15) << "Subject" << setw(15) << "Venue"
-         << setw(15) << "Student ID" << setw(20) << "Student Name" << setw(10) << "Type" << endl;
-    cout << "--------------------------------------------------------------------------------------------------" << endl;
 
     while (temp != NULL) {
-        // TODO: Only show for current week
         // TODO: Show all details
         // TODO: Display in date & time order
         if ((temp->lecID == lecturer->lecID)) {
-            tm dateTime = temp->schedDateTime;
-            auto dateStr = to_string(dateTime.tm_mday) + "/" + to_string(dateTime.tm_mon + 1) + "/" +
-                           to_string(dateTime.tm_year + 1900);
-            auto timeStr = to_string(dateTime.tm_hour) + ":" + to_string(dateTime.tm_min);
+            int daysDiff = (temp->schedDateTime.tm_yday - currentDate->tm_yday) % 7;
+            if (daysDiff >= 0 && daysDiff < 7) {
+                tm dateTime = temp->schedDateTime;
+                auto dateStr = to_string(dateTime.tm_mday) + "/" + to_string(dateTime.tm_mon + 1) + "/" +
+                               to_string(dateTime.tm_year + 1900);
+                auto timeStr = to_string(dateTime.tm_hour) + ":" + to_string(dateTime.tm_min);
 
-            Student *student = searchStud(temp->studID);
-            if (student != NULL) {
-                cout << setw(20) << dateStr << setw(10) << timeStr << setw(15) << student->studID << setw(20)
-                     << student->studName << endl;
+                Student *student = searchStud(temp->studID);
+                if (student != NULL) {
+                    cout << setw(20) << dateStr << setw(10) << timeStr << setw(15) << student->studID << setw(20)
+                         << student->studName << endl;
+                }
+                    // if the student does not exist, display -- instead
+                else {
+                    cout << setw(20) << dateStr << setw(10) << timeStr << setw(15) << "--" << setw(20) << "--" << endl;
+                }
             }
-                // if the student does not exist, display -- instead
-            else {
-                cout << setw(20) << dateStr << setw(10) << timeStr << setw(15) << "--" << setw(20) << "--" << endl;
-            }
-
         }
         temp = temp->nxtSched;
     }
@@ -509,8 +541,18 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
 void viewStudentsWithBookedConsultation(Lecturer *lecturer) {
     // Get all booked consultation slots for lecturer
     Schedule *currentSched = frontSched;
+
     while (currentSched != NULL) {
+        // only show current week's consultations
+        time_t now = time(0);
+        tm *currentDate = localtime(&now);
+        int daysDiff = (currentSched->schedDateTime.tm_yday - currentDate->tm_yday) % 7;
+        if (daysDiff < 0 || daysDiff > 7) {
+            currentSched = currentSched->nxtSched;
+            continue;
+        }
         if (currentSched->lecID == lecturer->lecID && currentSched->schedType == 'B') {
+
             // Get student details
             Student *currentStud = searchStud(currentSched->studID);
             // if student does not exist
@@ -526,26 +568,22 @@ void viewStudentsWithBookedConsultation(Lecturer *lecturer) {
             cout << "Student Course: " << currentStud->studCourse << endl;
 
             // Get all booked consultation slots for student
-            // TODO: Fix - displays other lecturer's slots with the same student
-            // TODO: Display for the current week's only?
-            Schedule *currentStudSched = frontSched;
-            while (currentStudSched != NULL) {
-                if (currentStudSched->studID == currentStud->studID && currentStudSched->schedType == 'B') {
-                    // Display consultation details
-                    cout << "\n--------------------------------------------------------------" << endl;
-                    cout << "Consultation Date: " << currentStudSched->schedDateTime.tm_mday << "/"
-                         << currentStudSched->schedDateTime.tm_mon + 1 << "/"
-                         << currentStudSched->schedDateTime.tm_year + 1900 << endl;
-                    cout << "Consultation Time: " << currentStudSched->schedDateTime.tm_hour << ":"
-                         << currentStudSched->schedDateTime.tm_min << endl;
-                    cout << "Consultation Venue: " << currentStudSched->venue << endl;
-                    cout << "Consultation Subject: " << currentStudSched->subject << endl;
-                }
-                currentStudSched = currentStudSched->nxtSched;
-            }
 
-            cout << "--------------------------------------------------------------" << endl;
+            // Display consultation details
+            cout << "\n--------------------------------------------------------------" << endl;
+            cout << "Consultation Date: " << currentSched->schedDateTime.tm_mday << "/"
+                 << currentSched->schedDateTime.tm_mon + 1 << "/" << currentSched->schedDateTime.tm_year + 1900 << endl;
+            cout << "Consultation Time: " << currentSched->schedDateTime.tm_hour << ":"
+                 << currentSched->schedDateTime.tm_min << endl;
+            cout << "Consultation Venue: " << currentSched->venue << endl;
+            cout << "Consultation Subject: " << currentSched->subject << endl;
+
+            cout << "------------------------------------------------------------\n" << endl;
+
+
         }
+
+
         currentSched = currentSched->nxtSched;
     }
 
