@@ -138,9 +138,7 @@ int main() {
                 cout << "4. Edit Consultation Slot Information" << endl;
                 cout << "5. Delete Consultation Slot" << endl;
 
-                cout
-                        << "\nPlease select your desired action by entering integers 1, 2, 3, 4, or 5, based on the corresponding functions above."
-                        << endl;
+                cout << "\nPlease select your desired action by entering integers 1, 2, 3, 4, or 5, based on the corresponding functions above." << endl;
                 cout << "Action: ";
                 cin >> action;
 
@@ -331,9 +329,7 @@ int main() {
                 cout << "3. View Booked Consultation History" << endl;
                 cout << "4. Delete Booked Consultation Slots" << endl;
 
-                cout
-                        << "\nPlease select your desired action by entering integers 1, 2, 3, or 4, based on the corresponding functions above."
-                        << endl;
+                cout << "\nPlease select your desired action by entering integers 1, 2, 3, or 4, based on the corresponding functions above." << endl;
                 cout << "Action: ";
                 cin >> action;
 
@@ -453,6 +449,7 @@ void addSchedule(tm schedDateTime, string subject, string venue, string lecID, s
     time_t now = time(0);
     tm *currentDate = localtime(&now);
     int daysDiff = (schedDateTime.tm_yday - currentDate->tm_yday) % 7;
+    // TODO: Fix - current week criteria
     if (daysDiff >= 0 && daysDiff < 7) {
         cout << "\nConsultation slot is within the current week. Please try again." << endl;
         return;
@@ -505,13 +502,11 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
     tm *currentDate = localtime(&now);
 
     cout << "\nConsultations of the Week for " << lecturer->lecID << " - " << lecturer->lecName << ":" << endl;
-    cout << setw(12) << "\nDate" << setw(12) << "Time" << setw(15) << "Subject" << setw(15) << "Venue" << setw(15)
-         << "Student ID" << setw(20) << "Student Name" << setw(10) << "Type" << endl;
     cout << "--------------------------------------------------------------------------------------------------"
          << endl;
 
     while (temp != NULL) {
-        // TODO: Show all details
+        // TODO: Fix - current week criteria
         if ((temp->lecID == lecturer->lecID)) {
             int daysDiff = (temp->schedDateTime.tm_yday - currentDate->tm_yday) % 7;
             if (daysDiff >= 0 && daysDiff < 7) {
@@ -522,9 +517,14 @@ void viewSchedulesForLecturer(Lecturer *lecturer) {
 
                 Student *student = searchStud(temp->studID);
                 if (student != NULL) {
-                    cout << setw(20) << dateStr << setw(10) << timeStr << setw(15) << student->studID << setw(20)
-                         << student->studName << endl;
+                    cout << "Date: " << dateStr << endl;
+                    cout << "Time: " << timeStr << endl;
+                    cout << "Subject: " << temp->subject << endl;
+                    cout << "Venue: " << temp->venue << endl;
+                    cout << "Lecturer: " << lecturer->lecID << " - " << lecturer->lecName << endl;
+                    cout << "Student: " << student->studID << " - " << student->studName << endl;
                 }
+                    // TODO: Is the below necessary
                     // if the student does not exist, display -- instead
                 else {
                     cout << setw(20) << dateStr << setw(10) << timeStr << setw(15) << "--" << setw(20) << "--" << endl;
