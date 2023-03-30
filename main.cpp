@@ -471,7 +471,7 @@ int main() {
                                 // View updated schedule
                                 viewSchedulesForStudent(currentStud);
                             } else {
-                                cout << "Invalid date and time. Please try again." << endl;
+                                cout << "Invalid slot details. Please try again." << endl;
                             }
                         } else {
                             cout << "Invalid Lecturer ID. Please try again." << endl;
