@@ -78,7 +78,7 @@ void viewBookingHistory(Student *student);
 
 void viewStudentsWithBookedConsultation(Lecturer *lecturer);
 
-Schedule *searchScheduleByDateTime(tm schedDateTime);
+Schedule *searchScheduleByDateTime(tm schedDateTime, string inLecID);
 
 
 int main() {
@@ -236,7 +236,7 @@ int main() {
                         } while (!validateDate(&schedDateTime));
 
                         // Search for schedule
-                        Schedule *currentSched = searchScheduleByDateTime(schedDateTime);
+                        Schedule *currentSched = searchScheduleByDateTime(schedDateTime, currentLec->lecID);
 
                         // If schedule is found
                         if (currentSched != NULL) {
@@ -373,7 +373,7 @@ int main() {
                             } while (!validateDate(&schedDateTime));
 
                             // Search for schedule
-                            Schedule *currentSched = searchScheduleByDateTime(schedDateTime);
+                            Schedule *currentSched = searchScheduleByDateTime(schedDateTime, searchedLec->lecID);
 
                             // If schedule is found
                             if (currentSched != NULL) {
@@ -433,20 +433,33 @@ int main() {
                             }
                         } while (!validateDate(&schedDateTime));
 
+
+                        Lecturer *searchedLec = new Lecturer;
+                        cout << "Lecturer ID: ";
+                        string searchID;
+                        getline(cin, searchID, '\n');
+                        transform(searchID.begin(), searchID.end(), searchID.begin(), ::toupper);
+
+                        searchedLec = searchLec(searchID);
+
                         // Search for schedule
-                        Schedule *currentSched = searchScheduleByDateTime(schedDateTime);
+                        if (searchedLec != NULL) {
+                            Schedule *currentSched = searchScheduleByDateTime(schedDateTime, searchedLec->lecID);
 
-                        // If schedule is found
-                        if (currentSched != NULL) {
-                            // Update schedule
-                            currentSched->subject = "";
-                            currentSched->studID = "";
-                            currentSched->schedType = 'A';
+                            // If schedule is found
+                            if (currentSched != NULL) {
+                                // Update schedule
+                                currentSched->subject = "";
+                                currentSched->studID = "";
+                                currentSched->schedType = 'A';
 
-                            cout << "Consultation slot is successfully deleted!" << endl;
+                                cout << "Consultation slot is successfully deleted!" << endl;
 
-                            // View updated schedule
-                            viewSchedulesForStudent(currentStud);
+                                // View updated schedule
+                                viewSchedulesForStudent(currentStud);
+                            }
+                        } else {
+                            cout << "Invalid Lecturer ID. Please try again." << endl;
                         }
                     }
 
@@ -799,11 +812,11 @@ void viewStudentsWithBookedConsultation(Lecturer *lecturer) {
 
 }
 
-Schedule *searchScheduleByDateTime(tm schedDateTime) {
+Schedule *searchScheduleByDateTime(tm schedDateTime, string inLecID) {
     Schedule *temp = frontSched;
     while (temp != NULL) {
         if (isSameDate(temp->schedDateTime, schedDateTime) && temp->schedDateTime.tm_hour == schedDateTime.tm_hour &&
-            temp->schedDateTime.tm_min == schedDateTime.tm_min) {
+            temp->schedDateTime.tm_min == schedDateTime.tm_min && temp->lecID == inLecID){
             return temp;
         }
         temp = temp->nxtSched;
