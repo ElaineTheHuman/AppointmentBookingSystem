@@ -100,6 +100,7 @@ int main() {
     // Note: You may change the schedDateTime objects below for testing purposes as
         // 1. addSchedule function doesn't allow adding date and time that is before current date or after 7 days of current date
         // 2. System (besides student's history function) does not display slots with dates that are before current date or after 7 days of current date
+    // tm scheduleDateTimeVariable = {sec, min, hour, day, month, year-1900}
     // TODO: For implementation testing purposes
     tm schedDateTime1 = {0, 0, 10, 1, 3, 123}; // 1st April, 10am
     tm schedDateTime2 = {0, 0, 15, 2, 3, 123}; // 2nd April, 3pm
