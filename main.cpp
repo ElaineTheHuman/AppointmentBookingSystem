@@ -100,6 +100,7 @@ int main() {
     tm schedDateTime3 = {0, 0, 8, 3, 3, 123}; // 3rd April, 8am
     tm schedDateTime4 = {0, 0, 14, 4, 3, 123}; // 4th April, 2pm
     tm schedDateTime5 = {0, 0, 12, 5, 3, 123}; // 5th April, 12pm
+    tm schedDateTime6 = {0, 0, 12, 5, 2, 123}; // 5th March, 12pm
     addSchedule(schedDateTime1, "", "MS Teams", "L01", "", 'A');
     addSchedule(schedDateTime3, "IT Project Management", "03-CRM-13", "L01", "S01", 'B');
     addSchedule(schedDateTime2, "", "MS Teams", "L02", "", 'A');
@@ -107,6 +108,7 @@ int main() {
     addSchedule(schedDateTime5, "Computer Ethics", "MS Teams", "L03", "S01", 'B');
     addSchedule(schedDateTime1, "", "MS Teams", "L03", "", 'A');
     addSchedule(schedDateTime4, "Data Structures", "03-CRM-08", "L04", "S02", 'B');
+    // addSchedule(schedDateTime6, "FYP", "03-CRM-12", "L05", "S01", 'B');
 
     char user = 'X';
 
@@ -155,7 +157,6 @@ int main() {
                 char choice;
                 if (action == 1) {
                     // 1. Set Schedule for Consultation
-
                     // Show lecturer's current schedule
                     viewSchedulesForLecturer(currentLec);
 
@@ -185,7 +186,6 @@ int main() {
 
                         // Get venue
                         cout << "Venue: ";
-                        cin.ignore();
                         getline(cin, venue, '\n');
 
                         // Get lecturer ID
@@ -245,7 +245,6 @@ int main() {
 
                             // Get venue
                             cout << "Venue: ";
-                            cin.ignore();
                             getline(cin, venue, '\n');
 
                             // Update schedule
@@ -383,7 +382,6 @@ int main() {
 
                                 // Get subject
                                 cout << "Subject: ";
-                                cin.ignore();
                                 getline(cin, inSubject, '\n');
 
                                 // Update schedule
@@ -392,9 +390,6 @@ int main() {
                                 currentSched->schedType = 'B';
 
                                 cout << "Consultation slot is successfully booked!" << endl;
-
-                                // View updated schedule
-                                viewAvailableConsultation(searchedLec);
                             } else {
                                 cout << "\nConsultation slot not found. Please try again." << endl;
                             }
