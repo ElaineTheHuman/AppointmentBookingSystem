@@ -97,7 +97,10 @@ int main() {
     frontStud = studA;
 
     // Existing schedules already added into the system
-    // TODO: Comment this / Don't submit this
+    // Note: You may change the schedDateTime objects below for testing purposes as
+        // 1. addSchedule function doesn't allow adding date and time that is before current date or after 7 days of current date
+        // 2. System (besides student's history function) does not display slots with dates that are before current date or after 7 days of current date
+    // TODO: For implementation testing purposes
     tm schedDateTime1 = {0, 0, 10, 1, 3, 123}; // 1st April, 10am
     tm schedDateTime2 = {0, 0, 15, 2, 3, 123}; // 2nd April, 3pm
     tm schedDateTime3 = {0, 0, 8, 3, 3, 123}; // 3rd April, 8am
@@ -105,14 +108,12 @@ int main() {
     tm schedDateTime5 = {0, 0, 12, 5, 3, 123}; // 5th April, 12pm
     tm schedDateTime6 = {0, 0, 12, 5, 2, 123}; // 5th March, 12pm
 
-    // TODO: Submit this / uncomment
+    // TODO: For presentation demonstration purposes
     // tm schedDateTime1 = {0, 0, 10, 4, 3, 123}; // 4th April, 10am
     // tm schedDateTime2 = {0, 0, 15, 5, 3, 123}; // 5th April, 3pm
     // tm schedDateTime3 = {0, 0, 8, 6, 3, 123}; // 6th April, 8am
     // tm schedDateTime4 = {0, 0, 14, 7, 3, 123}; // 7th April, 2pm
     // tm schedDateTime5 = {0, 0, 12, 8, 3, 123}; // 8th April, 12pm
-    // tm schedDateTime6 = {0, 0, 12, 8, 2, 123}; // 8th March, 12pm
-    // TODO: addSchedule function doesn't allow adding date and time that is before current date or after 7 days of current date
     addSchedule(schedDateTime1, "", "MS Teams", "L01", "", 'A');
     addSchedule(schedDateTime3, "IT Project Management", "03-CRM-13", "L01", "S01", 'B');
     addSchedule(schedDateTime2, "", "MS Teams", "L02", "", 'A');
@@ -120,7 +121,6 @@ int main() {
     addSchedule(schedDateTime5, "Computer Ethics", "MS Teams", "L03", "S01", 'B');
     addSchedule(schedDateTime1, "", "MS Teams", "L03", "", 'A');
     addSchedule(schedDateTime4, "Data Structures", "03-CRM-08", "L04", "S02", 'B');
-    // addSchedule(schedDateTime6, "FYP", "03-CRM-12", "L05", "S01", 'B');
 
     char user = 'X';
 
